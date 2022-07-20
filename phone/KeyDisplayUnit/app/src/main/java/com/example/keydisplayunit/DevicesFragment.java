@@ -102,7 +102,7 @@ public class DevicesFragment extends ListFragment {
             return true;
         } else if (id ==R.id.read_mode) {
             final String[] values = getResources().getStringArray(R.array.read_modes);
-            int pos = withIoManager ? 1 : 0; // read_modes[0]=event/io-manager, read_modes[1]=direct
+            int pos = withIoManager ? 0 : 0; // read_modes[0]=event/io-manager, read_modes[1]=direct
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Read mode");
             builder.setSingleChoiceItems(values, pos, (dialog, which) -> {

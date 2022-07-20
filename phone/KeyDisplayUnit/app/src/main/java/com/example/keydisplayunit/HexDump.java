@@ -150,4 +150,17 @@ public class HexDump {
 
         return buffer;
     }
+
+    public static String fromHexToString(byte[] array, int offset, int length) {
+        String OutputString = new String();
+        char[] Temp_Char = toHexString(array, offset, length).toCharArray();
+        for(int x = 0; x < Temp_Char.length; x=x+2) {
+            String Temp_String = ""+Temp_Char[x]+""+Temp_Char[x+1];
+            char character = (char)Integer.parseInt(Temp_String, 16);
+            OutputString = OutputString + character;
+        }
+
+        return OutputString;
+    }
+
 }

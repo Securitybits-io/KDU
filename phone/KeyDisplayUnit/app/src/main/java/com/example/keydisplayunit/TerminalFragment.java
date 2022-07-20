@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -35,6 +34,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -45,7 +45,7 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
     private static final int WRITE_WAIT_MILLIS = 2000;
-    private static final int READ_WAIT_MILLIS = 2000;
+    private static final int READ_WAIT_MILLIS = 20;
 
     private int deviceId, portNum, baudRate;
     private boolean withIoManager;
@@ -53,12 +53,17 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     private final BroadcastReceiver broadcastReceiver;
     private final Handler mainLooper;
     private TextView receiveText;
+    private TextView txtFreqA;
+    private TextView txtFreqB;
     private ControlLines controlLines;
 
     private SerialInputOutputManager usbIoManager;
     private UsbSerialPort usbSerialPort;
     private UsbPermission usbPermission = UsbPermission.Unknown;
     private boolean connected = false;
+
+    byte[] readBuffer;
+    private ByteArrayOutputStream outputStream;
 
     public TerminalFragment() {
         broadcastReceiver = new BroadcastReceiver() {
@@ -84,7 +89,7 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         setRetainInstance(true);
         deviceId = getArguments().getInt("device");
         portNum = getArguments().getInt("port");
-        baudRate = Constants.BAUDRATE; //getArguments().getInt("baud"); //TODO: Remove BAUDRATES from menu
+        baudRate = Constants.BAUDRATE;
         withIoManager = getArguments().getBoolean("withIoManager");
     }
 
@@ -117,12 +122,10 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
-        TextView sendText = view.findViewById(R.id.send_text);
-
-        View sendBtn = view.findViewById(R.id.send_btn);
-        sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
-
         View receiveBtn = view.findViewById(R.id.receive_btn);
+
+        txtFreqA = view.findViewById(R.id.txtFreqA);
+        txtFreqB = view.findViewById(R.id.txtFreqB);
 
         // Single press of the buttons
         View changeRadioBtn = view.findViewById(R.id.btnChangeRadioChan);
@@ -175,16 +178,13 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
         // Press and hold
 
-        kduClrBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                long start  = System.currentTimeMillis();
-                long end    = start + 1500;
-                while (System.currentTimeMillis() < end) {
-                    sendKeyPress(Constants.MessageCLR);
-                }
-                return true;
+        kduClrBtn.setOnLongClickListener(v -> {
+            long start  = System.currentTimeMillis();
+            long end    = start + 1500;
+            while (System.currentTimeMillis() < end) {
+                sendKeyPress(Constants.MessageCLR);
             }
+            return true;
         });
 
         controlLines = new ControlLines(view);
@@ -207,25 +207,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         if (id == R.id.clear) {
             receiveText.setText("");
             return true;
-        } else if( id == R.id.send_break) {
-            if(!connected) {
-                Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
-            } else {
-                try {
-                    usbSerialPort.setBreak(true);
-                    Thread.sleep(100); // should show progress bar instead of blocking UI thread
-                    usbSerialPort.setBreak(false);
-                    SpannableStringBuilder spn = new SpannableStringBuilder();
-                    spn.append("send <break>\n");
-                    spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorSendText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    receiveText.append(spn);
-                } catch(UnsupportedOperationException ignored) {
-                    Toast.makeText(getActivity(), "BREAK not supported", Toast.LENGTH_SHORT).show();
-                } catch(Exception e) {
-                    Toast.makeText(getActivity(), "BREAK failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
@@ -237,7 +218,11 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     @Override
     public void onNewData(byte[] data) {
         mainLooper.post(() -> {
-            receive(data);
+            try {
+                continuousMessage(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -320,24 +305,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         usbSerialPort = null;
     }
 
-    private void send(String str) {
-        if(!connected) {
-            Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            byte[] data = (str + '\n').getBytes();
-            SpannableStringBuilder spn = new SpannableStringBuilder();
-            spn.append("send " + data.length + " bytes\n");
-            spn.append(HexDump.dumpHexString(data)).append("\n");
-            spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorSendText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            receiveText.append(spn);
-            usbSerialPort.write(data, WRITE_WAIT_MILLIS);
-        } catch (Exception e) {
-            onRunError(e);
-        }
-    }
-
     private void sendKeyPress(byte[] message){
         if(!connected) {
             Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
@@ -362,9 +329,9 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             return;
         }
         try {
-            byte[] buffer = new byte[8192];
+            byte[] buffer = new byte[512];
             int len = usbSerialPort.read(buffer, READ_WAIT_MILLIS);
-            receive(Arrays.copyOf(buffer, len));
+            createMessage(Arrays.copyOf(buffer, len));
         } catch (IOException e) {
             // when using read with timeout, USB bulkTransfer returns -1 on timeout _and_ errors
             // like connection loss, so there is typically no exception thrown here on error
@@ -373,12 +340,75 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         }
     }
 
+    private void continuousMessage(byte[] data) throws IOException {
+        //SpannableStringBuilder spn = new SpannableStringBuilder();
+        //spn.append("receive " + data.length + " bytes\n");
+
+        if(data.length > 0) {
+
+            outputStream = new ByteArrayOutputStream();
+            if(readBuffer != null && readBuffer.length > 0) {
+                outputStream.write(readBuffer);
+            }
+            outputStream.write(data);
+
+            readBuffer = outputStream.toByteArray();
+            //spn.append("receive " + readBuffer.length + " bytes\n");
+            if (readBuffer.length > 96){ // Got enough data to stitch a config up
+                int startPos = 0;
+                for(byte b : readBuffer)
+                {
+                    if (b == -69 && (startPos+32) < readBuffer.length){ // -69 Is the config start Control Character
+                        txtFreqA.setText("Channel A: " + HexDump.fromHexToString(readBuffer, startPos+1, 9));
+                        txtFreqB.setText("Channel B: " + HexDump.fromHexToString(readBuffer, startPos+11, 9));
+                        break;
+                    }
+                    startPos += 1;
+                }
+
+
+                readBuffer = new byte[0];//Empty the readBuffer
+            }
+            //spn.append(HexDump.dumpHexString(data)).append("\n");
+        }
+        //receiveText.append(spn); // TODO HERE
+    }
+
+    private void createMessage(byte[] data){
+        byte[] message = new byte[196];
+        byte[] c = new byte[message.length + data.length];
+        System.arraycopy(message, 0, c, 0, message.length);
+        System.arraycopy(data, 0, c, message.length, data.length);
+        SpannableStringBuilder spn = new SpannableStringBuilder();
+        if (c.length > 128)
+        {
+            spn.append("Recieved: "+c.length+" bytes\n");
+            int bytePos = 0;
+            for (byte b : c){
+                if (b == (byte) 0xbb) // If byte b == 0xbb <- start of message
+                {
+
+                    byte[] shortMessage = new byte[32];
+                    // copy from c to shortMessage 32 bytes starting at bytePos
+                    System.arraycopy(c, bytePos, shortMessage, 0, 32);
+                    txtFreqA.setText("Channel A: " + HexDump.fromHexToString(shortMessage, 1, 9));
+                    txtFreqB.setText("Channel B: " + HexDump.fromHexToString(shortMessage, 11, 9));
+                    spn.append("Message: @"+bytePos+"\n"+HexDump.dumpHexString(shortMessage)).append("\n");
+                    break;
+                }
+                bytePos += 1;
+            }
+            //spn.append(HexDump.dumpHexString(c)).append("\n"); //DEBUG to Dump the whole message
+        }
+        receiveText.append(spn);
+    }
+
     private void receive(byte[] data) {
         SpannableStringBuilder spn = new SpannableStringBuilder();
         spn.append("receive " + data.length + " bytes\n");
-        if(data.length > 0)
-            spn.append(HexDump.dumpHexString(data)).append("\n");
-        receiveText.append(spn); // TODO HERE
+        //if(data.length > 0)
+        //    spn.append(HexDump.dumpHexString(data)).append("\n");
+        receiveText.append(spn);
     }
 
     void status(String str) {
