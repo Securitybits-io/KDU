@@ -36,7 +36,6 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.EnumSet;
 
 public class TerminalFragment extends Fragment implements SerialInputOutputManager.Listener {
@@ -45,7 +44,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     private static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
     private static final int WRITE_WAIT_MILLIS = 2000;
-    private static final int READ_WAIT_MILLIS = 20;
 
     private int deviceId, portNum, baudRate;
     private boolean withIoManager;
@@ -122,8 +120,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
-        View receiveBtn = view.findViewById(R.id.receive_btn);
-
         txtFreqA = view.findViewById(R.id.txtFreqA);
         txtFreqB = view.findViewById(R.id.txtFreqB);
 
@@ -188,11 +184,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         });
 
         controlLines = new ControlLines(view);
-        if(withIoManager) {
-            receiveBtn.setVisibility(View.GONE);
-        } else {
-            receiveBtn.setOnClickListener(v -> read());
-        }
         return view;
     }
 
@@ -323,23 +314,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         }
     }
 
-    private void read() {
-        if(!connected) {
-            Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        try {
-            byte[] buffer = new byte[512];
-            int len = usbSerialPort.read(buffer, READ_WAIT_MILLIS);
-            createMessage(Arrays.copyOf(buffer, len));
-        } catch (IOException e) {
-            // when using read with timeout, USB bulkTransfer returns -1 on timeout _and_ errors
-            // like connection loss, so there is typically no exception thrown here on error
-            status("connection lost: " + e.getMessage());
-            disconnect();
-        }
-    }
-
     private void continuousMessage(byte[] data) throws IOException {
         //SpannableStringBuilder spn = new SpannableStringBuilder();
         //spn.append("receive " + data.length + " bytes\n");
@@ -372,43 +346,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             //spn.append(HexDump.dumpHexString(data)).append("\n");
         }
         //receiveText.append(spn); // TODO HERE
-    }
-
-    private void createMessage(byte[] data){
-        byte[] message = new byte[196];
-        byte[] c = new byte[message.length + data.length];
-        System.arraycopy(message, 0, c, 0, message.length);
-        System.arraycopy(data, 0, c, message.length, data.length);
-        SpannableStringBuilder spn = new SpannableStringBuilder();
-        if (c.length > 128)
-        {
-            spn.append("Recieved: "+c.length+" bytes\n");
-            int bytePos = 0;
-            for (byte b : c){
-                if (b == (byte) 0xbb) // If byte b == 0xbb <- start of message
-                {
-
-                    byte[] shortMessage = new byte[32];
-                    // copy from c to shortMessage 32 bytes starting at bytePos
-                    System.arraycopy(c, bytePos, shortMessage, 0, 32);
-                    txtFreqA.setText("Channel A: " + HexDump.fromHexToString(shortMessage, 1, 9));
-                    txtFreqB.setText("Channel B: " + HexDump.fromHexToString(shortMessage, 11, 9));
-                    spn.append("Message: @"+bytePos+"\n"+HexDump.dumpHexString(shortMessage)).append("\n");
-                    break;
-                }
-                bytePos += 1;
-            }
-            //spn.append(HexDump.dumpHexString(c)).append("\n"); //DEBUG to Dump the whole message
-        }
-        receiveText.append(spn);
-    }
-
-    private void receive(byte[] data) {
-        SpannableStringBuilder spn = new SpannableStringBuilder();
-        spn.append("receive " + data.length + " bytes\n");
-        //if(data.length > 0)
-        //    spn.append(HexDump.dumpHexString(data)).append("\n");
-        receiveText.append(spn);
     }
 
     void status(String str) {

@@ -1,6 +1,5 @@
 package com.example.keydisplayunit;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -23,7 +22,6 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class DevicesFragment extends ListFragment {
 
@@ -99,17 +97,6 @@ public class DevicesFragment extends ListFragment {
         int id = item.getItemId();
         if(id == R.id.refresh) {
             refresh();
-            return true;
-        } else if (id ==R.id.read_mode) {
-            final String[] values = getResources().getStringArray(R.array.read_modes);
-            int pos = withIoManager ? 0 : 0; // read_modes[0]=event/io-manager, read_modes[1]=direct
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Read mode");
-            builder.setSingleChoiceItems(values, pos, (dialog, which) -> {
-                withIoManager = (which == 0);
-                dialog.dismiss();
-            });
-            builder.create().show();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
