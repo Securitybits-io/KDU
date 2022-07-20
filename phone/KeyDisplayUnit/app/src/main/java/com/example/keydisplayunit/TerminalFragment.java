@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -123,15 +124,15 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
         View receiveBtn = view.findViewById(R.id.receive_btn);
 
+        // Single press of the buttons
         View changeRadioBtn = view.findViewById(R.id.btnChangeRadioChan);
-        changeRadioBtn.setOnClickListener(v -> sendKeyPress(Constants.MessageSWITCHMEMORYSLOT));
-
         View volIncreaseBtn = view.findViewById(R.id.btnVolumeIncrease);
         View volDecreaseBtn = view.findViewById(R.id.btnVolumeDecrease);
+        View pttBtn = view.findViewById(R.id.btnPTT);
+
+        changeRadioBtn.setOnClickListener(v -> sendKeyPress(Constants.MessageSWITCHMEMORYSLOT));
         volIncreaseBtn.setOnClickListener(v -> sendKeyPress(Constants.MessageVOLUP));
         volDecreaseBtn.setOnClickListener(v -> sendKeyPress(Constants.MessageVOLDOWN));
-
-        View pttBtn = view.findViewById(R.id.btnPTT);
         pttBtn.setOnClickListener(v -> sendKeyPress(Constants.MessagePTT));
 
         View kduZeroBtn     = view.findViewById(R.id.btnKDUZero);
@@ -171,6 +172,20 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         kduEntBtn.setOnClickListener(v -> sendKeyPress(Constants.MessageENT));
         kduPrePos.setOnClickListener(v -> sendKeyPress(Constants.MessagePREUP));
         kduPreNeg.setOnClickListener(v -> sendKeyPress(Constants.MessagePREDOWN));
+
+        // Press and hold
+
+        kduClrBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                long start  = System.currentTimeMillis();
+                long end    = start + 1500;
+                while (System.currentTimeMillis() < end) {
+                    sendKeyPress(Constants.MessageCLR);
+                }
+                return true;
+            }
+        });
 
         controlLines = new ControlLines(view);
         if(withIoManager) {
