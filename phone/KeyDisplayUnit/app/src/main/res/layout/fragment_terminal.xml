@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,96 +12,177 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/layoutTopBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ToggleButton
-                android:id="@+id/controlLineRts"
+            <TextView
+                android:id="@+id/txtRxTx"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="48sp"
-                android:textOff="RTS"
-                android:textOn="RTS" />
+                android:layout_weight="0"
+                android:text=" R " />
 
-            <ToggleButton
-                android:id="@+id/controlLineCts"
+            <TextView
+                android:id="@+id/txtBat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:minWidth="48sp"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textOff="CTS"
-                android:textOn="CTS" />
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="BAT " />
 
-            <View
-                android:layout_width="6dp"
-                android:layout_height="match_parent" />
+            <ProgressBar
+                android:id="@+id/barBat"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="60sp"
+                android:layout_height="match_parent"
+                android:layout_weight="0" />
 
-            <ToggleButton
-                android:id="@+id/controlLineDtr"
+            <TextView
+                android:id="@+id/txtVolumeCtrl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="48sp"
-                android:textOff="DTR"
-                android:textOn="DTR" />
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="VULOS" />
 
-            <ToggleButton
-                android:id="@+id/controlLineDsr"
+            <TextView
+                android:id="@+id/txtMicType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:minWidth="48sp"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textOff="DSR"
-                android:textOn="DSR" />
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="MOI" />
 
-            <View
-                android:layout_width="6dp"
-                android:layout_height="match_parent" />
-
-            <ToggleButton
-                android:id="@+id/controlLineCd"
+            <TextView
+                android:id="@+id/txtCTActive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:minWidth="48sp"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textOff="CD"
-                android:textOn="CD" />
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="- -" />
 
-            <ToggleButton
-                android:id="@+id/controlLineRi"
+            <TextView
+                android:id="@+id/txtUnknown"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:minWidth="48sp"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textOff="RI"
-                android:textOn="RI" />
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="-" />
 
+            <TextView
+                android:id="@+id/txtESActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:layout_weight="0"
+                android:text="- -" />
+
+            <TextView
+                android:id="@+id/txtAMActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginRight="10sp"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="AM" />
+
+            <TextView
+                android:id="@+id/txtPTActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10sp"
+                android:layout_weight="0"
+                android:text="- -" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtFreqA"
+        <LinearLayout
+            android:id="@+id/layoutFreqA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Channel A:" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtFreqB"
+            <TextView
+                android:id="@+id/txtFreqA"
+                android:layout_width="162dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="000.00000"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/txtChannelA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutFreqB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtFreqB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="000.00000"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/txtChannelB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutBottomBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Channel B:" />
+            android:orientation="horizontal">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp" />
+            <TextView
+                android:id="@+id/txtTypeFreqShift"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:text="TYPE" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="?android:attr/listDivider" />
+            <TextView
+                android:id="@+id/txtTRFRPT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:text="TRF" />
+
+            <TextView
+                android:id="@+id/txtPower"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:text="MOD" />
+
+            <TextView
+                android:id="@+id/txtSQLLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10sp"
+                android:text="SQL0" />
+
+            <TextView
+                android:id="@+id/txtLock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10sp"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="KEY" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/receive_text"
@@ -112,11 +194,6 @@
             android:scrollbars="vertical"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:typeface="monospace" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="?android:attr/listDivider" />
 
     </LinearLayout>
 

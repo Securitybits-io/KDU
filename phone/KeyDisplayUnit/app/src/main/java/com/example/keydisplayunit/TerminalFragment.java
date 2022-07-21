@@ -11,6 +11,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
@@ -23,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,9 +34,10 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.EnumSet;
 
 public class TerminalFragment extends Fragment implements SerialInputOutputManager.Listener {
 
@@ -53,7 +54,23 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     private TextView receiveText;
     private TextView txtFreqA;
     private TextView txtFreqB;
-    private ControlLines controlLines;
+
+    private TextView txtChannelA;
+    private TextView txtChannelB;
+
+    private TextView txtRxTx;
+    private TextView txtVolumeCtrl;
+    private TextView txtMicType;
+    private TextView txtCTActive;
+    private TextView txtESActive;
+    private TextView txtAMActive;
+    private TextView txtPTActive;
+
+    private TextView txtTypeFreqShift;
+    private TextView txtTRFRPT;
+    private TextView txtPower;
+    private TextView txtSQLLevel;
+    private TextView txtLock;
 
     private SerialInputOutputManager usbIoManager;
     private UsbSerialPort usbSerialPort;
@@ -123,6 +140,23 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         txtFreqA = view.findViewById(R.id.txtFreqA);
         txtFreqB = view.findViewById(R.id.txtFreqB);
 
+        txtChannelA = view.findViewById(R.id.txtChannelA);
+        txtChannelB = view.findViewById(R.id.txtChannelB);
+
+        txtRxTx         = view.findViewById(R.id.txtRxTx);
+        txtVolumeCtrl   = view.findViewById(R.id.txtVolumeCtrl);
+        txtMicType      = view.findViewById(R.id.txtMicType);
+        txtCTActive     = view.findViewById(R.id.txtCTActive);
+        txtESActive     = view.findViewById(R.id.txtESActive);
+        txtAMActive     = view.findViewById(R.id.txtAMActive);
+        txtPTActive     = view.findViewById(R.id.txtPTActive);
+
+        txtTypeFreqShift    = view.findViewById(R.id.txtTypeFreqShift);
+        txtTRFRPT           = view.findViewById(R.id.txtTRFRPT);
+        txtPower            = view.findViewById(R.id.txtPower);
+        txtSQLLevel         = view.findViewById(R.id.txtSQLLevel);
+        txtLock             = view.findViewById(R.id.txtLock);
+
         // Single press of the buttons
         View changeRadioBtn = view.findViewById(R.id.btnChangeRadioChan);
         View volIncreaseBtn = view.findViewById(R.id.btnVolumeIncrease);
@@ -183,7 +217,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             return true;
         });
 
-        controlLines = new ControlLines(view);
         return view;
     }
 
@@ -194,9 +227,19 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        int id = item.getItemId(); //TODO add shortcut buttons
         if (id == R.id.clear) {
             receiveText.setText("");
+            return true;
+        } else if (id == R.id.change_freq_mode){
+            sendKeyPress(Constants.MessageENT);
+            SystemClock.sleep(300);
+            sendKeyPress(Constants.MessageONE);
+            return true;
+        } else if (id == R.id.screen_light){
+            sendKeyPress(Constants.MessageENT);
+            SystemClock.sleep(300);
+            sendKeyPress(Constants.MessageTWO);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -275,7 +318,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             }
             status("connected");
             connected = true;
-            controlLines.start(); //TODO: Are controllines necessary?
         } catch (Exception e) {
             status("connection failed: " + e.getMessage());
             disconnect();
@@ -284,7 +326,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     private void disconnect() {
         connected = false;
-        controlLines.stop();
         if(usbIoManager != null) {
             usbIoManager.setListener(null);
             usbIoManager.stop();
@@ -314,6 +355,213 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         }
     }
 
+    private int bitSet(int n, int k)
+    {   // if it results to '1' then bit is set,
+        // else it results to '0' bit is unset
+        return ((n >> k) & 1);
+    }
+
+    private void setTopRxTx(int option){
+        String RxTx = "";
+        switch (option){
+            case 64: //0100 0000
+                RxTx = " R ";
+                break;
+            case 96: //0110 0000
+                RxTx = " T ";
+                break;
+            default:
+                RxTx = " - ";
+        }
+        txtRxTx.setText(RxTx);
+    }
+
+    private void setTopVolumeControl(int option){
+        String control = "ELECT";
+        if (option == 1){
+            control = "VULOS";
+        }
+        txtVolumeCtrl.setText(control);
+    }
+
+    private void setTopMicType(int option){
+        String mic = "MOI";
+        if (option == 1){
+            mic = "DYN";
+        }
+        txtMicType.setText(mic);
+    }
+
+    private void setTopCT(int option){
+        String ct = "- -";
+        if (option == 1){
+            ct = "CT";
+        }
+        txtCTActive.setText(ct);
+    }
+
+    private void setTopES(int option){
+        String es = "- -";
+        if (option == 1) {
+            es = "ES";
+        }
+        txtESActive.setText(es);
+    }
+
+    private void setTopAM(int option){
+        if(option == 1)
+            txtAMActive.setVisibility(View.VISIBLE);
+        else
+            txtAMActive.setVisibility(View.INVISIBLE);
+    }
+
+    private void setTopPT(int options){
+        String pt = "- -";
+        if (options == 1)
+            pt = "PT";
+        txtPTActive.setText(pt);
+    }
+
+    private void setRowTop(byte[] data){
+        //Rx Tx Symbol
+        setTopRxTx((data[25] & 96)); // AND operation against 0110 0000
+        setTopVolumeControl(bitSet(data[26], 1)); // Check if bit is set
+        setTopMicType(bitSet(data[27], 5)); //Check if 5th Bit is set
+        setTopCT(bitSet(data[27], 3));
+        setTopES(bitSet(data[28], 5));
+        setTopAM(bitSet(data[28], 3));
+        setTopPT(bitSet(data[28], 1));
+
+        //TODO Battery Bar
+        //TODO Volume Bar
+    }
+
+    private void setBottomFreqShift(int option){
+        String type = "TYPE";
+        switch (option){
+            case 32:    //0010 0000
+                type = "TYPE+";
+                break;
+            case 48:    //0011 0000
+                type = "TYPE-";
+                break;
+        }
+        txtTypeFreqShift.setText(type);
+    }
+
+    private void setTRFRPT(int option){
+        String trf = "TRF";
+        if (option == 1)
+            trf = "RPT";
+        txtTRFRPT.setText(trf);
+    }
+
+    private void setPower(int option){
+        String power = "LOW";
+        switch (option){
+            case 2:
+                power = "MOD"; // 0000 0010
+                break;
+            case 3:
+                power = "HIGH"; // 0000 0011
+                break;
+        }
+        txtPower.setText(power);
+    }
+
+    private void setSQLLevel(int option) {
+        String sql = "";
+        switch (option){
+            case 8: // 0000 1000
+                sql = "SQL1";
+                break;
+            case 12: // 0000 1100
+                sql = "SQL2";
+                break;
+            case 16: // 0001 0000
+                sql = "SQL3";
+                break;
+            case 20: // 0001 0100
+                sql = "SQL4";
+                break;
+            case 24: // 0001 1000
+                sql = "SQL5";
+                break;
+            case 28: // 0001 1100
+                sql = "SQL6";
+                break;
+            case 32: // 0010 0000
+                sql = "SQL7";
+                break;
+            case 36: // 0010 0100
+                sql = "SQL8";
+                break;
+            case 40: // 0010 1000
+                sql = "SQL9";
+                break;
+            default:    // 0000 0100
+                sql = "SQL0";
+        }
+        txtSQLLevel.setText(sql);
+    }
+
+    private void setLock(int option){
+        String lock = "KEY";
+        if (option == 1)
+            lock = "LOCK";
+        txtLock.setText(lock);
+    }
+
+    private void setRowBottom(byte[] data){
+        setBottomFreqShift((data[29] & 48));
+        setTRFRPT(bitSet(data[29], 3));
+        setPower((data[29] & 3));
+        setSQLLevel((data[30] & 60)); // 0011 1100
+        setLock(bitSet(data[30], 1));
+    }
+
+    private void setRowFreqA(byte[] data){ //TODO Do Frequency Cycle Open ASCII 175/ Unicode 00BB?
+        String freqA = "   ";
+
+        if (bitSet(data[23], 0) == 0) {
+            freqA = "> ";
+            if (bitSet(data[24], 1) == 1)
+                freqA = "\u00BB ";
+        }
+
+        freqA += HexDump.fromHexToString(data, 1, 9);
+        txtFreqA.setText(freqA);
+
+        int intMemoryA = Math.abs(data[21]);
+        if (intMemoryA > 0){
+            txtChannelA.setVisibility(View.VISIBLE);
+            txtChannelA.setText(String.format("%03d", intMemoryA));
+        } else {
+            txtChannelA.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setRowFreqB(byte[] data){ //TODO Do Frequency Cycle Open
+        String freqB = "   ";
+
+        if (bitSet(data[23], 0) == 1) {
+            freqB = "> ";
+            if (bitSet(data[24], 1) == 1)
+                freqB = "\u00BB ";
+        }
+
+        freqB += HexDump.fromHexToString(data, 11, 9);
+        txtFreqB.setText(freqB);
+
+        int intMemoryB = Math.abs(data[22]);
+        if (intMemoryB > 0){
+            txtChannelB.setVisibility(View.VISIBLE);
+            txtChannelB.setText(String.format("%03d", intMemoryB));
+        } else {
+            txtChannelB.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private void continuousMessage(byte[] data) throws IOException {
         //SpannableStringBuilder spn = new SpannableStringBuilder();
         //spn.append("receive " + data.length + " bytes\n");
@@ -329,108 +577,33 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             readBuffer = outputStream.toByteArray();
             //spn.append("receive " + readBuffer.length + " bytes\n");
             if (readBuffer.length > 96){ // Got enough data to stitch a config up
+
                 int startPos = 0;
                 for(byte b : readBuffer)
                 {
                     if (b == -69 && (startPos+32) < readBuffer.length){ // -69 Is the config start Control Character
-                        txtFreqA.setText("Channel A: " + HexDump.fromHexToString(readBuffer, startPos+1, 9));
-                        txtFreqB.setText("Channel B: " + HexDump.fromHexToString(readBuffer, startPos+11, 9));
+                        byte[] message = new byte[32];
+                        System.arraycopy(readBuffer, startPos, message, 0, 32);
+
+                        setRowFreqA(message);
+                        setRowFreqB(message);
+                        setRowTop(message);
+                        setRowBottom(message);
+                        startPos = 0;
                         break;
                     }
                     startPos += 1;
                 }
-
-
                 readBuffer = new byte[0];//Empty the readBuffer
             }
             //spn.append(HexDump.dumpHexString(data)).append("\n");
         }
-        //receiveText.append(spn); // TODO HERE
+        //receiveText.append(spn);
     }
 
     void status(String str) {
         SpannableStringBuilder spn = new SpannableStringBuilder(str+'\n');
         spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorStatusText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         receiveText.append(spn);
-    }
-
-    class ControlLines {
-        private static final int refreshInterval = 200; // msec
-
-        private final Runnable runnable;
-        private final ToggleButton rtsBtn, ctsBtn, dtrBtn, dsrBtn, cdBtn, riBtn;
-
-        ControlLines(View view) {
-            runnable = this::run; // w/o explicit Runnable, a new lambda would be created on each postDelayed, which would not be found again by removeCallbacks
-
-            rtsBtn = view.findViewById(R.id.controlLineRts);
-            ctsBtn = view.findViewById(R.id.controlLineCts);
-            dtrBtn = view.findViewById(R.id.controlLineDtr);
-            dsrBtn = view.findViewById(R.id.controlLineDsr);
-            cdBtn = view.findViewById(R.id.controlLineCd);
-            riBtn = view.findViewById(R.id.controlLineRi);
-            rtsBtn.setOnClickListener(this::toggle);
-            dtrBtn.setOnClickListener(this::toggle);
-        }
-
-        private void toggle(View v) {
-            ToggleButton btn = (ToggleButton) v;
-            if (!connected) {
-                btn.setChecked(!btn.isChecked());
-                Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String ctrl = "";
-            try {
-                if (btn.equals(rtsBtn)) { ctrl = "RTS"; usbSerialPort.setRTS(btn.isChecked()); }
-                if (btn.equals(dtrBtn)) { ctrl = "DTR"; usbSerialPort.setDTR(btn.isChecked()); }
-            } catch (IOException e) {
-                status("set" + ctrl + "() failed: " + e.getMessage());
-            }
-        }
-
-        private void run() {
-            if (!connected)
-                return;
-            try {
-                EnumSet<UsbSerialPort.ControlLine> controlLines = usbSerialPort.getControlLines();
-                rtsBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.RTS));
-                ctsBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.CTS));
-                dtrBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.DTR));
-                dsrBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.DSR));
-                cdBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.CD));
-                riBtn.setChecked(controlLines.contains(UsbSerialPort.ControlLine.RI));
-                mainLooper.postDelayed(runnable, refreshInterval);
-            } catch (IOException e) {
-                status("getControlLines() failed: " + e.getMessage() + " -> stopped control line refresh");
-            }
-        }
-
-        void start() {
-            if (!connected)
-                return;
-            try {
-                EnumSet<UsbSerialPort.ControlLine> controlLines = usbSerialPort.getSupportedControlLines();
-                if (!controlLines.contains(UsbSerialPort.ControlLine.RTS)) rtsBtn.setVisibility(View.INVISIBLE);
-                if (!controlLines.contains(UsbSerialPort.ControlLine.CTS)) ctsBtn.setVisibility(View.INVISIBLE);
-                if (!controlLines.contains(UsbSerialPort.ControlLine.DTR)) dtrBtn.setVisibility(View.INVISIBLE);
-                if (!controlLines.contains(UsbSerialPort.ControlLine.DSR)) dsrBtn.setVisibility(View.INVISIBLE);
-                if (!controlLines.contains(UsbSerialPort.ControlLine.CD))   cdBtn.setVisibility(View.INVISIBLE);
-                if (!controlLines.contains(UsbSerialPort.ControlLine.RI))   riBtn.setVisibility(View.INVISIBLE);
-                run();
-            } catch (IOException e) {
-                Toast.makeText(getActivity(), "getSupportedControlLines() failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        void stop() {
-            mainLooper.removeCallbacks(runnable);
-            rtsBtn.setChecked(false);
-            ctsBtn.setChecked(false);
-            dtrBtn.setChecked(false);
-            dsrBtn.setChecked(false);
-            cdBtn.setChecked(false);
-            riBtn.setChecked(false);
-        }
     }
 }
