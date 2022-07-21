@@ -21,7 +21,7 @@
 ## Pos 4 - Top Transmisison Bar | Frequency Slot Select
 ```
 0000 0000
-        ^ - Frequency Slot Selection, Top (01), Bottom (10)
+       ^^ - Frequency Slot Selection, Top (01), Bottom (10)
   ^^ ^^   - Bottom, Transmission Bar
   				1010 - Full bar
   				0001 - Empty Bar
