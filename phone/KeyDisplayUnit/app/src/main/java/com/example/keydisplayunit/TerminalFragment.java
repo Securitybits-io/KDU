@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,17 +52,25 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     private final BroadcastReceiver broadcastReceiver;
     private final Handler mainLooper;
-    private TextView receiveText;
+
     private TextView txtFreqA;
     private TextView txtFreqB;
 
     private TextView txtChannelA;
     private TextView txtChannelB;
 
+    private TextView txtSignalStrengthA;
+    private TextView txtSignalStrengthB;
+    private ProgressBar barSignalStrengthA;
+    private ProgressBar barSignalStrengthB;
+
     private TextView txtRxTx;
+    private TextView txtBatVol;
+    private ProgressBar barVolumeBattery;
     private TextView txtVolumeCtrl;
     private TextView txtMicType;
     private TextView txtCTActive;
+    private TextView txtRCTC;
     private TextView txtESActive;
     private TextView txtAMActive;
     private TextView txtPTActive;
@@ -133,9 +142,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_terminal, container, false);
-        receiveText = view.findViewById(R.id.receive_text);                          // TextView performance decreases with number of spans
-        receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
-        receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         txtFreqA = view.findViewById(R.id.txtFreqA);
         txtFreqB = view.findViewById(R.id.txtFreqB);
@@ -143,10 +149,18 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         txtChannelA = view.findViewById(R.id.txtChannelA);
         txtChannelB = view.findViewById(R.id.txtChannelB);
 
+        txtSignalStrengthA =  view.findViewById(R.id.txtSignalStrengthA);
+        txtSignalStrengthB = view.findViewById(R.id.txtSignalStrengthB);
+        barSignalStrengthA = view.findViewById(R.id.barSignalStrengthA);
+        barSignalStrengthB = view.findViewById(R.id.barSignalStrengthB);
+
         txtRxTx         = view.findViewById(R.id.txtRxTx);
         txtVolumeCtrl   = view.findViewById(R.id.txtVolumeCtrl);
+        txtBatVol       = view.findViewById(R.id.txtBatVol);
+        barVolumeBattery = view.findViewById(R.id.barVolumeBattery);
         txtMicType      = view.findViewById(R.id.txtMicType);
         txtCTActive     = view.findViewById(R.id.txtCTActive);
+        txtRCTC         = view.findViewById(R.id.txtRCTC);
         txtESActive     = view.findViewById(R.id.txtESActive);
         txtAMActive     = view.findViewById(R.id.txtAMActive);
         txtPTActive     = view.findViewById(R.id.txtPTActive);
@@ -228,10 +242,7 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId(); //TODO add shortcut buttons
-        if (id == R.id.clear) {
-            receiveText.setText("");
-            return true;
-        } else if (id == R.id.change_freq_mode){
+        if (id == R.id.change_freq_mode){
             sendKeyPress(Constants.MessageENT);
             SystemClock.sleep(300);
             sendKeyPress(Constants.MessageONE);
@@ -344,19 +355,14 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         }
         try {
             byte[] data = message;
-            SpannableStringBuilder spn = new SpannableStringBuilder();
-            spn.append("send " + data.length + " bytes\n");
-            spn.append(HexDump.dumpHexString(data)).append("\n");
-            spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorSendText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            receiveText.append(spn);
             usbSerialPort.write(data, WRITE_WAIT_MILLIS);
         } catch (Exception e) {
             onRunError(e);
         }
     }
 
-    private int bitSet(int n, int k)
-    {   // if it results to '1' then bit is set,
+    private int bitSet(int n, int k) {
+        // if it results to '1' then bit is set,
         // else it results to '0' bit is unset
         return ((n >> k) & 1);
     }
@@ -374,6 +380,103 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
                 RxTx = " - ";
         }
         txtRxTx.setText(RxTx);
+    }
+
+    private void setTopBatBar(int option){
+        txtBatVol.setText("BAT");
+        int batteryLevel = 0;
+        switch (option){
+            case 1: // 0000 0001
+                batteryLevel = 0;
+                break;
+            case 2: // 0000 0010
+                batteryLevel = 20;
+                break;
+            case 3: // 0000 0011
+                batteryLevel = 40;
+                break;
+            case 4: // 0000 0100
+                batteryLevel = 60;
+                break;
+            case 5: // 0000 0101
+                batteryLevel = 80;
+                break;
+            case 6: // 0000 0110
+                batteryLevel = 100;
+                break;
+        }
+        barVolumeBattery.setProgress(batteryLevel);
+    }
+
+    private void setTopVolBar(int option){
+        txtBatVol.setText("VOL");
+        int volume = 0;
+        switch (option) {
+            case 4:         // Lowest 0: 0000 0100
+                volume = 0;
+                break;
+            case 8:         // 0000 1000
+                volume = 5;
+                break;
+            case 12:        // 0000 1100
+                volume = 10;
+                break;
+            case 16:        // 0001 0000
+                volume = 15;
+                break;
+            case 20:        // 0001 0100
+                volume = 20;
+                break;
+            case 24:        // 0001 1000
+                volume = 25;
+                break;
+            case 28:        // 0001 1100
+                volume = 30;
+                break;
+            case 32:        // 0010 0000
+                volume = 35;
+                break;
+            case 36:        // 0010 0100
+                volume = 40;
+                break;
+            case 40:        // 0010 1000
+                volume = 45;
+                break;
+            case 44:        // 0010 1100
+                volume = 50;
+                break;
+            case 48:        // 0011 0000
+                volume = 55;
+                break;
+            case 52:        // 0011 0100
+                volume = 60;
+                break;
+            case 56:        // 0011 1000
+                volume = 65;
+                break;
+            case 60:        // 0011 1100
+                volume = 70;
+                break;
+            case 64:        // 0100 0000
+                volume = 75;
+                break;
+            case 68:        // 0100 0100
+                volume = 80;
+                break;
+            case 72:        // 0100 1000
+                volume = 85;
+                break;
+            case 76:        // 0100 1100
+                volume = 90;
+                break;
+            case 80:        // 0101 0000
+                volume = 95;
+                break;
+            case 84:        // Higest: 0101 0100
+                volume = 100;
+                break;
+            }
+        barVolumeBattery.setProgress(volume);
     }
 
     private void setTopVolumeControl(int option){
@@ -398,6 +501,13 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             ct = "CT";
         }
         txtCTActive.setText(ct);
+    }
+
+    private void setTopRCTC(int option){
+        String rctc = "-";
+        if (option == 1)
+            rctc = "T";
+        txtRCTC.setText(rctc);
     }
 
     private void setTopES(int option){
@@ -425,15 +535,19 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
     private void setRowTop(byte[] data){
         //Rx Tx Symbol
         setTopRxTx((data[25] & 96)); // AND operation against 0110 0000
+
+        if (bitSet(data[25],4) == 0) // if display batterybar bit is 0, show volume
+            setTopVolBar((data[26] & 124)); // AND againt 0111 1100
+        else
+            setTopBatBar((data[25] & 15)); // AND against 0000 1111
+
         setTopVolumeControl(bitSet(data[26], 1)); // Check if bit is set
         setTopMicType(bitSet(data[27], 5)); //Check if 5th Bit is set
         setTopCT(bitSet(data[27], 3));
+        setTopRCTC(bitSet(data[27], 1));
         setTopES(bitSet(data[28], 5));
         setTopAM(bitSet(data[28], 3));
         setTopPT(bitSet(data[28], 1));
-
-        //TODO Battery Bar
-        //TODO Volume Bar
     }
 
     private void setBottomFreqShift(int option){
@@ -449,14 +563,14 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         txtTypeFreqShift.setText(type);
     }
 
-    private void setTRFRPT(int option){
+    private void setBottomTRFRPT(int option){
         String trf = "TRF";
         if (option == 1)
             trf = "RPT";
         txtTRFRPT.setText(trf);
     }
 
-    private void setPower(int option){
+    private void setBottomPower(int option){
         String power = "LOW";
         switch (option){
             case 2:
@@ -469,7 +583,7 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         txtPower.setText(power);
     }
 
-    private void setSQLLevel(int option) {
+    private void setBottomSQLLevel(int option) {
         String sql = "";
         switch (option){
             case 8: // 0000 1000
@@ -505,7 +619,7 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         txtSQLLevel.setText(sql);
     }
 
-    private void setLock(int option){
+    private void setBottomLock(int option){
         String lock = "KEY";
         if (option == 1)
             lock = "LOCK";
@@ -514,13 +628,13 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
 
     private void setRowBottom(byte[] data){
         setBottomFreqShift((data[29] & 48));
-        setTRFRPT(bitSet(data[29], 3));
-        setPower((data[29] & 3));
-        setSQLLevel((data[30] & 60)); // 0011 1100
-        setLock(bitSet(data[30], 1));
+        setBottomTRFRPT(bitSet(data[29], 3));
+        setBottomPower((data[29] & 3));
+        setBottomSQLLevel((data[30] & 60)); // 0011 1100
+        setBottomLock(bitSet(data[30], 1));
     }
 
-    private void setRowFreqA(byte[] data){ //TODO Do Frequency Cycle Open ASCII 175/ Unicode 00BB?
+    private void setRowFreqA(byte[] data){
         String freqA = "   ";
 
         if (bitSet(data[23], 0) == 0) {
@@ -539,9 +653,55 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         } else {
             txtChannelA.setVisibility(View.INVISIBLE);
         }
+
+        // only dashes data[23]
+        if ((data[23] & 60) == 60) {
+            barSignalStrengthA.setVisibility(View.GONE);
+            txtSignalStrengthA.setVisibility(View.VISIBLE);
+        } else {
+            txtSignalStrengthA.setVisibility(View.GONE);
+            barSignalStrengthA.setVisibility(View.VISIBLE);
+            int signalStrength = 0;
+            switch ((data[23] & 60)){
+                case 4:		// 00000100
+                    signalStrength = 0;
+                    break;
+                case 8:		// 00001000
+                    signalStrength = 10;
+                    break;
+                case 12: 	// 00001100
+                    signalStrength = 20;
+                    break;
+                case 16:	// 00010000
+                    signalStrength = 30;
+                    break;
+                case 20:	// 00010100
+                    signalStrength = 40;
+                    break;
+                case 24:	// 00011000
+                    signalStrength = 50;
+                    break;
+                case 28:	// 00011100
+                    signalStrength = 60;
+                    break;
+                case 32:	// 00100000
+                    signalStrength = 70;
+                    break;
+                case 36:	// 00100100
+                    signalStrength = 80;
+                    break;
+                case 40:	// 00101000
+                    signalStrength = 90;
+                    break;
+                default:
+                    signalStrength = 0;
+
+            }
+            barSignalStrengthA.setProgress(signalStrength);
+        }
     }
 
-    private void setRowFreqB(byte[] data){ //TODO Do Frequency Cycle Open
+    private void setRowFreqB(byte[] data){
         String freqB = "   ";
 
         if (bitSet(data[23], 0) == 1) {
@@ -560,11 +720,54 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
         } else {
             txtChannelB.setVisibility(View.INVISIBLE);
         }
+
+        // only dashes data[23]
+        if ((data[24] & 60) == 60) {
+            barSignalStrengthB.setVisibility(View.GONE);
+            txtSignalStrengthB.setVisibility(View.VISIBLE);
+        } else {
+            txtSignalStrengthB.setVisibility(View.GONE);
+            barSignalStrengthB.setVisibility(View.VISIBLE);
+            int signalStrength = 0;
+            switch ((data[24] & 60)){
+                case 4:		// 00000100
+                    signalStrength = 0;
+                    break;
+                case 8:		// 00001000
+                    signalStrength = 10;
+                    break;
+                case 12: 	// 00001100
+                    signalStrength = 20;
+                    break;
+                case 16:	// 00010000
+                    signalStrength = 30;
+                    break;
+                case 20:	// 00010100
+                    signalStrength = 40;
+                    break;
+                case 24:	// 00011000
+                    signalStrength = 50;
+                    break;
+                case 28:	// 00011100
+                    signalStrength = 60;
+                    break;
+                case 32:	// 00100000
+                    signalStrength = 70;
+                    break;
+                case 36:	// 00100100
+                    signalStrength = 80;
+                    break;
+                case 40:	// 00101000
+                    signalStrength = 90;
+                    break;
+                default:
+                    signalStrength = 0;
+            }
+            barSignalStrengthB.setProgress(signalStrength);
+        }
     }
 
     private void continuousMessage(byte[] data) throws IOException {
-        //SpannableStringBuilder spn = new SpannableStringBuilder();
-        //spn.append("receive " + data.length + " bytes\n");
 
         if(data.length > 0) {
 
@@ -575,7 +778,6 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             outputStream.write(data);
 
             readBuffer = outputStream.toByteArray();
-            //spn.append("receive " + readBuffer.length + " bytes\n");
             if (readBuffer.length > 96){ // Got enough data to stitch a config up
 
                 int startPos = 0;
@@ -589,21 +791,20 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
                         setRowFreqB(message);
                         setRowTop(message);
                         setRowBottom(message);
+
                         startPos = 0;
                         break;
                     }
                     startPos += 1;
                 }
-                readBuffer = new byte[0];//Empty the readBuffer
+                readBuffer = new byte[0]; //Empty the readBuffer
             }
-            //spn.append(HexDump.dumpHexString(data)).append("\n");
         }
-        //receiveText.append(spn);
     }
 
     void status(String str) {
         SpannableStringBuilder spn = new SpannableStringBuilder(str+'\n');
         spn.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorStatusText)), 0, spn.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        receiveText.append(spn);
+        Toast.makeText(getActivity(), spn, Toast.LENGTH_SHORT).show();
     }
 }

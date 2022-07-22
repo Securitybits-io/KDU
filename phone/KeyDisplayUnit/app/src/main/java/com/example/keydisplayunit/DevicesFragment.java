@@ -59,7 +59,7 @@ public class DevicesFragment extends ListFragment {
                     text1.setText("<no driver>");
                 else
                     text1.setText("Radio 0"+(position+1));
-                text2.setText("TRI PRC-152 10w");
+                text2.setText("TRI PRC-152 15w");
                 //else if(item.driver.getPorts().size() == 1)
                 //    text1.setText(item.driver.getClass().getSimpleName().replace("SerialDriver",""));
                 //else
@@ -76,7 +76,7 @@ public class DevicesFragment extends ListFragment {
         setListAdapter(null);
         View header = getActivity().getLayoutInflater().inflate(R.layout.device_list_header, null, false);
         getListView().addHeaderView(header, null, false);
-        setEmptyText("<no USB devices found>");
+        setEmptyText("<No Radio detected>");
         ((TextView) getListView().getEmptyView()).setTextSize(18);
         setListAdapter(listAdapter);
     }

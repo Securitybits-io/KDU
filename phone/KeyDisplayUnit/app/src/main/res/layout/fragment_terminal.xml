@@ -12,189 +12,239 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/layoutTopBar"
+            android:id="@+id/layoutRadioContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginTop="10sp"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txtRxTx"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text=" R " />
-
-            <TextView
-                android:id="@+id/txtBat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="BAT " />
-
-            <ProgressBar
-                android:id="@+id/barBat"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="60sp"
-                android:layout_height="match_parent"
-                android:layout_weight="0" />
-
-            <TextView
-                android:id="@+id/txtVolumeCtrl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="VULOS" />
-
-            <TextView
-                android:id="@+id/txtMicType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="MOI" />
-
-            <TextView
-                android:id="@+id/txtCTActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="- -" />
-
-            <TextView
-                android:id="@+id/txtUnknown"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="-" />
-
-            <TextView
-                android:id="@+id/txtESActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:layout_weight="0"
-                android:text="- -" />
-
-            <TextView
-                android:id="@+id/txtAMActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="AM" />
-
-            <TextView
-                android:id="@+id/txtPTActive"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10sp"
-                android:layout_weight="0"
-                android:text="- -" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutFreqA"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtFreqA"
-                android:layout_width="162dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="000.00000"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/txtChannelA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="000" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutFreqB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/txtFreqB"
+            <LinearLayout
+                android:id="@+id/layoutTopBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="000.00000"
-                android:textSize="20sp" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/txtChannelB"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/txtRxTx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text=" R " />
+
+                <TextView
+                    android:id="@+id/txtBatVol"
+                    android:layout_width="30sp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="BAT" />
+
+                <ProgressBar
+                    android:id="@+id/barVolumeBattery"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="60sp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5sp"
+                    android:layout_weight="0"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#009E07"
+                    android:scaleY="3" />
+
+                <TextView
+                    android:id="@+id/txtVolumeCtrl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="VULOS" />
+
+                <TextView
+                    android:id="@+id/txtMicType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="MOI" />
+
+                <TextView
+                    android:id="@+id/txtCTActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="- -" />
+
+                <TextView
+                    android:id="@+id/txtRCTC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="-" />
+
+                <TextView
+                    android:id="@+id/txtESActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="0"
+                    android:text="- -" />
+
+                <TextView
+                    android:id="@+id/txtAMActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="AM" />
+
+                <TextView
+                    android:id="@+id/txtPTActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="0"
+                    android:text="- -" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutFreqA"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="000" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtFreqA"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="  000.00000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtChannelA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="000" />
+
+                <TextView
+                    android:id="@+id/txtSignalStrengthA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="- - -    - -"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/barSignalStrengthA"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:max="90"
+                    android:paddingLeft="50sp"
+                    android:progressTint="#509A29"
+                    android:scaleY="4" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutFreqB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txtFreqB"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="  000.00000"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/txtChannelB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="000" />
+
+                <TextView
+                    android:id="@+id/txtSignalStrengthB"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="- - -    - -"
+                    tools:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/barSignalStrengthB"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:max="90"
+                    android:paddingLeft="50sp"
+                    android:progressTint="#509A29"
+                    android:scaleY="4" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutBottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtTypeFreqShift"
+                    android:layout_width="50sp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="TYPE" />
+
+                <TextView
+                    android:id="@+id/txtTRFRPT"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="TRF" />
+
+                <TextView
+                    android:id="@+id/txtPower"
+                    android:layout_width="50sp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="MOD" />
+
+                <TextView
+                    android:id="@+id/txtSQLLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="SQL0" />
+
+                <TextView
+                    android:id="@+id/txtLock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10sp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="KEY" />
+            </LinearLayout>
+
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutBottomBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtTypeFreqShift"
-                android:layout_width="50sp"
-                android:layout_height="wrap_content"
-                android:text="TYPE" />
-
-            <TextView
-                android:id="@+id/txtTRFRPT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:text="TRF" />
-
-            <TextView
-                android:id="@+id/txtPower"
-                android:layout_width="50sp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:text="MOD" />
-
-            <TextView
-                android:id="@+id/txtSQLLevel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:text="SQL0" />
-
-            <TextView
-                android:id="@+id/txtLock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10sp"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="KEY" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/receive_text"
-            android:layout_width="match_parent"
-            android:layout_height="524dp"
-            android:layout_weight="1"
-            android:freezesText="true"
-            android:gravity="bottom"
-            android:scrollbars="vertical"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:typeface="monospace" />
-
     </LinearLayout>
 
     <LinearLayout
