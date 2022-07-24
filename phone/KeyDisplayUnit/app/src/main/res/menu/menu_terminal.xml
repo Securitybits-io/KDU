@@ -3,12 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/change_freq_mode"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_switch_24dp"
         android:title="Channel Mode"
         app:showAsAction="never" />
     <item
         android:id="@+id/screen_light"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_lightbulb_24dp"
         android:title="Screen Light"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/lock"
+        android:icon="@drawable/ic_lock_24dp"
+        android:title="Keypad Lock"
+        app:showAsAction="ifRoom"/>
 </menu>

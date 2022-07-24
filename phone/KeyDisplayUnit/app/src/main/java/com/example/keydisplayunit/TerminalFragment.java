@@ -14,7 +14,6 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.method.ScrollingMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,8 +33,6 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
-
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -251,6 +248,13 @@ public class TerminalFragment extends Fragment implements SerialInputOutputManag
             sendKeyPress(Constants.MessageENT);
             SystemClock.sleep(300);
             sendKeyPress(Constants.MessageTWO);
+            return true;
+        } else if (id == R.id.lock){
+            long start  = System.currentTimeMillis();
+            long end    = start + 1500;
+            while (System.currentTimeMillis() < end) {
+                sendKeyPress(Constants.MessageCLR);
+            }
             return true;
         } else {
             return super.onOptionsItemSelected(item);

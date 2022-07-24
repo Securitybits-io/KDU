@@ -10,7 +10,7 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"
-            android:label="TRI PRC152 Key Display Unit"
+            android:label="TRI PRC152 KDU"
             android:screenOrientation="sensorLandscape"
             android:exported="true" >
             <intent-filter>
