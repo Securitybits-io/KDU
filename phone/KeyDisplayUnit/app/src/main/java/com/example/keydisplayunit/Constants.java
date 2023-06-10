@@ -21,8 +21,8 @@ public class Constants {
     static final byte[] MessageENT              = { (byte)0xAA, (byte)0x00, (byte)0x0F, (byte)0x00 };
     static final byte[] MessagePREUP            = { (byte)0xAA, (byte)0x00, (byte)0x31, (byte)0x00 };
     static final byte[] MessagePREDOWN          = { (byte)0xAA, (byte)0x00, (byte)0x32, (byte)0x00 };
-    static final byte[] MessageARROWRIGHT       = { (byte)0xAA, (byte)0x00, (byte)0x31, (byte)0x00 };
-    static final byte[] MessageARROWLEFT        = { (byte)0xAA, (byte)0x00, (byte)0x32, (byte)0x00 };
+    static final byte[] MessageARROWRIGHT       = { (byte)0xAA, (byte)0x00, (byte)0x0e, (byte)0x00 };
+    static final byte[] MessageARROWLEFT        = { (byte)0xAA, (byte)0x00, (byte)0x0d, (byte)0x00 };
     static final byte[] MessageNULL             = { (byte)0xAA, (byte)0x00, (byte)0x00, (byte)0x00 };
 
     // KDU Connection constants
