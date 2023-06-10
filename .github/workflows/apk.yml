@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - phone/KeyDisplayUnit/
+  workflow_dispatch:
 
 jobs:
   apk:
