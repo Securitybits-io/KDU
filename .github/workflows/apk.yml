@@ -1,0 +1,25 @@
+name: build and ship APK
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  apk:
+    name: Generate APK
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Setup JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Build APK
+      run: cd phone/KeyDisplayUnit && bash ./gradlew assembleDebug --stacktrace
+    - name: Upload APK
+      uses: actions/upload-artifact@v1
+      with:
+        name: apk
+        path: phone/KeyDisplayUnit/app/build/outputs/apk/debug/app-debug.apk 
