@@ -1,0 +1,87 @@
+Global:
+  TONE: 1000HZ
+  DTM-TM: 100MS
+  OFFSET: 00.00000
+  SFT: OFF
+  BCL: OFF
+  TOT: OFF
+  ANI_ID: ""
+  DTMF: ""
+memslot1:
+  COMP: OFF
+  SQL: SQ3
+  W/NA: WIDE
+  POWER: LOW
+  STEP: 6.25K
+  Channels:
+    1:
+      memslot: 1
+      name: PMR-01
+      freq: 446.00625
+    2:
+      memslot: 2
+      name: PMR-02
+      freq: 446.01875
+    3:
+      memslot: 3
+      name: PMR-03
+      freq: 446.03125
+    4:
+      memslot: 4
+      name: PMR-04
+      freq: 446.04375
+    5:
+      memslot: 5
+      name: PMR-05
+      freq: 446.05625
+    6:
+      memslot: 6
+      name: PMR-06
+      freq: 446.06875
+    7:
+      memslot: 7
+      name: PMR-07
+      freq: 446.08125
+    8:
+      memslot: 8
+      name: PMR-08
+      freq: 446.09375
+memslot2:
+  COMP: OFF
+  SQL: SQ3
+  W/NA: WIDE
+  POWER: HIGH
+  STEP: 6.25K
+  Channels:
+    1:
+      memslot: 1
+      name: PMR-01
+      freq: 446.00625
+    2:
+      memslot: 2
+      name: PMR-02
+      freq: 446.01875
+    3:
+      memslot: 3
+      name: PMR-03
+      freq: 446.03125
+    4:
+      memslot: 4
+      name: PMR-04
+      freq: 446.04375
+    5:
+      memslot: 5
+      name: PMR-05
+      freq: 446.05625
+    6:
+      memslot: 6
+      name: PMR-06
+      freq: 446.06875
+    7:
+      memslot: 7
+      name: PMR-07
+      freq: 446.08125
+    8:
+      memslot: 8
+      name: PMR-08
+      freq: 446.09375
