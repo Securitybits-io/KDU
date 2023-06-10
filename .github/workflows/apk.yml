@@ -28,6 +28,9 @@ jobs:
     needs: apk
     runs-on: ubuntu-latest
     steps:
+      - name: set env
+        run: echo "NOW=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+
       - name: download APK from build
         uses: actions/download-artifact@v1
         with:
@@ -39,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: First release?
-          release_name: Release First release?
+          tag_name: ${{ env.NOW }}
+          release_name: Release ${{ env.NOW }}
 
       - name: Upload Release APK
         id: upload_release_asset
