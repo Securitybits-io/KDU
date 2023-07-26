@@ -1,7 +1,7 @@
 import serial
 from time import sleep
 BAUD = 19200
-PORT = '/dev/ttyUSB0'
+PORT = input("USB Device, default is /dev/ttyUSB0 \n")
 ser = serial.Serial(PORT, BAUD)
 
 data = bytearray()
