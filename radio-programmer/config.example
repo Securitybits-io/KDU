@@ -1,7 +1,7 @@
 Global:
   TONE: 1000HZ
   DTM-TM: 100MS
-  OFFSET: 00.00000
+  OFFSET: "00.00000"
   SFT: OFF
   BCL: OFF
   TOT: OFF
@@ -46,6 +46,38 @@ memslot1:
       memslot: 8
       name: PMR-08
       freq: 446.09375
+    9:
+      memslot: 9
+      name: PMR-09
+      freq: 446.10625
+    10:
+      memslot: 10
+      name: PMR-10
+      freq: 446.11875
+    11:
+      memslot: 11
+      name: PMR-11
+      freq: 446.13125
+    12:
+      memslot: 12
+      name: PMR-12
+      freq: 446.14375
+    13:
+      memslot: 13
+      name: PMR-13
+      freq: 446.15625
+    14:
+      memslot: 14
+      name: PMR-14
+      freq: 446.16875
+    15:
+      memslot: 15
+      name: PMR-15
+      freq: 446.18125
+    16:
+      memslot: 16
+      name: PMR-16
+      freq: 446.19375
 memslot2:
   COMP: OFF
   SQL: SQ3
@@ -85,3 +117,35 @@ memslot2:
       memslot: 8
       name: PMR-08
       freq: 446.09375
+    9:
+      memslot: 9
+      name: PMR-09
+      freq: 446.10625
+    10:
+      memslot: 10
+      name: PMR-10
+      freq: 446.11875
+    11:
+      memslot: 11
+      name: PMR-11
+      freq: 446.13125
+    12:
+      memslot: 12
+      name: PMR-12
+      freq: 446.14375
+    13:
+      memslot: 13
+      name: PMR-13
+      freq: 446.15625
+    14:
+      memslot: 14
+      name: PMR-14
+      freq: 446.16875
+    15:
+      memslot: 15
+      name: PMR-15
+      freq: 446.18125
+    16:
+      memslot: 16
+      name: PMR-16
+      freq: 446.19375
