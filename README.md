@@ -3,6 +3,9 @@
 
 Repo for the KDU Projects
 
+![KDU](https://github.com/Securitybits-io/KDU/assets/25975089/e2ad2413-d2a0-4c04-8caf-76e5abb62b39)
+
+
 ## PRC-152
 
 Baudrate: 19200
